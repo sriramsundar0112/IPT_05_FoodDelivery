@@ -1,0 +1,88 @@
+services:
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb
+    restart: unless-stopped
+    user: root
+    mem_limit: 1500m
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_db:/data/db
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: us-east-1
+        awslogs-create-group: "true"
+        awslogs-group: food-del-app
+        awslogs-stream: mongodb
+    networks:
+      - food-del-app
+
+  food-del-backend:
+    image: food-del-backend:latest
+    container_name: food-del-backend
+    restart: unless-stopped
+    user: root
+    mem_limit: 500m
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./env/backend.env
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: us-east-1
+        awslogs-create-group: "true"
+        awslogs-group: food-del-app
+        awslogs-stream: food-del-backend
+    networks:
+      - food-del-app
+    
+  food-del-frontend:
+    image: food-del-frontend:latest
+    container_name: food-del-frontend
+    restart: unless-stopped
+    user: root
+    mem_limit: 500m
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./env/frontend.env
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: us-east-1
+        awslogs-create-group: "true"
+        awslogs-group: food-del-app
+        awslogs-stream: food-del-frontend
+    networks:
+      - food-del-app
+  
+  food-del-admin:
+    image: food-del-admin:latest
+    container_name: food-del-admin
+    restart: unless-stopped
+    user: root
+    mem_limit: 500m
+    ports:
+      - "5174:5174"
+    env_file:
+      - ./env/admin.env
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: us-east-1
+        awslogs-create-group: "true"
+        awslogs-group: food-del-app
+        awslogs-stream: food-del-admin
+    networks:
+      - food-del-app
+ 
+ 
+volumes:
+  mongo_db:
+  
+networks:
+  food-del-app:
+    driver: bridge
