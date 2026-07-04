@@ -10,7 +10,7 @@ pipeline{
         ACCOUNT_ID = "982614288416"
         ECR_REPO_BACKEND = "food-delivery-backend"
         ECR_REPO_FRONTEND = "food-delivery-backend"
-        ECR_REPO_ADMIN = "food-delivery-backend"
+        ECR_REPO_ADMIN = "food-delivery-admin"
     }
 
     stages{
