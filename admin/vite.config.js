@@ -6,6 +6,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    base: '/admin/',
     server: {
       port: Number(env.VITE_PORT) || 5174,
     },
