@@ -5,7 +5,8 @@ export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
 
-    const url = import.meta.env.VITE_BACKEND_URL
+    const url = window.APP_CONFIG.BACKEND_URL;
+    console.log("URL is =",url)
     const [food_list, setFoodList] = useState([]);
     const [cartItems, setCartItems] = useState({});
     const [token, setToken] = useState("")
@@ -48,7 +49,11 @@ const StoreContextProvider = (props) => {
     }
 
     const fetchFoodList = async () => {
+        console.log("Entering Fetch Food List method.....");
         const response = await axios.get(url + "/api/food/list");
+        console.log("Full response =", response);
+        console.log("response.data =", response?.data);
+        console.log("response.data.data =", response?.data?.data);
         setFoodList(response.data.data)
     }
 
@@ -68,6 +73,8 @@ const StoreContextProvider = (props) => {
         loadData()
     }, [])
 
+    console.log("Provider food_list Before =", food_list);
+
     const contextValue = {
         url,
         food_list,
@@ -83,6 +90,8 @@ const StoreContextProvider = (props) => {
         currency,
         deliveryCharge
     };
+
+    console.log("Provider food_list After =", food_list);
 
     return (
         <StoreContext.Provider value={contextValue}>
