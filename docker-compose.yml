@@ -1,25 +1,32 @@
 services:
-  mongodb:
-    image: mongodb/mongodb-community-server:latest
-    container_name: mongodb
+  nginx:
+    image: nginx:1.30.3-alpine
+    container_name: nginx
     restart: unless-stopped
-    user: root
-    mem_limit: 1500m
+    mem_limit: 128m
     ports:
-      - "27017:27017"
-    volumes:
-      - mongo_db:/data/db
+      - "80:80"
     networks:
       - food-del-app
-
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    
+    depends_on:
+      - food-del-backend
+      - food-del-frontend
+      - food-del-admin
+ 
+     
   food-del-backend:
     image: food-del-backend:latest
     container_name: food-del-backend
     restart: unless-stopped
-    user: root
+    user: node
     mem_limit: 500m
-    ports:
-      - "4000:4000"
+    expose:
+      - "4000"
     env_file:
       - ./env/backend.env
     networks:
@@ -29,10 +36,9 @@ services:
     image: food-del-frontend:latest
     container_name: food-del-frontend
     restart: unless-stopped
-    user: root
     mem_limit: 500m
-    ports:
-      - "5173:5173"
+    expose:
+      - "80"
     env_file:
       - ./env/frontend.env
     networks:
@@ -42,19 +48,14 @@ services:
     image: food-del-admin:latest
     container_name: food-del-admin
     restart: unless-stopped
-    user: root
     mem_limit: 500m
-    ports:
-      - "5174:5174"
+    expose:
+      - "80"
     env_file:
       - ./env/admin.env
     networks:
       - food-del-app
  
- 
-volumes:
-  mongo_db:
-  
 networks:
   food-del-app:
     driver: bridge
