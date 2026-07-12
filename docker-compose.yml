@@ -29,6 +29,8 @@ services:
       - "4000"
     env_file:
       - ./env/backend.env
+    volumes:
+      - food-images:/app/uploads/
     networks:
       - food-del-app
     
@@ -59,3 +61,8 @@ services:
 networks:
   food-del-app:
     driver: bridge
+
+volumes:
+  food-images:
+
+
