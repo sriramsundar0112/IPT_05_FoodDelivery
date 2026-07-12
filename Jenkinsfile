@@ -75,6 +75,7 @@ pipeline{
                 docker build -t food-del-backend:$BUILD_NUMBER .
                 docker tag food-del-backend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:$BUILD_NUMBER
                 docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:$BUILD_NUMBER
+				docker tag food-del-backend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:latest
 				docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:latest
                 cd ..
                 '''
@@ -90,6 +91,7 @@ pipeline{
                 docker build -t food-del-frontend:$BUILD_NUMBER .
                 docker tag food-del-frontend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:$BUILD_NUMBER
                 docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:$BUILD_NUMBER
+				docker tag food-del-frontend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:latest
 				docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:latest
                 cd ..
                 '''
@@ -105,6 +107,7 @@ pipeline{
                 docker build -t food-del-admin:$BUILD_NUMBER .
                 docker tag food-del-admin:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:$BUILD_NUMBER
                 docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:$BUILD_NUMBER
+				docker tag  food-del-admin:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:latest
 				docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:latest
                 cd ..
                 '''
