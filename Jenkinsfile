@@ -141,7 +141,7 @@ pipeline{
             }
         }
 
-        stage ('Push Food Delivery Frontend Image to ECR')
+        stage ('Push Food Delivery Admin Image to ECR')
         {
             steps
             {
