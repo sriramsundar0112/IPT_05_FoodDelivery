@@ -1,5 +1,6 @@
 def printTrivySummary(String reportFile) {
     sh """
+        set +x
         HIGH=\$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="HIGH")] | length' ${reportFile})
         CRITICAL=\$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' ${reportFile})
         TOTAL=\$((HIGH + CRITICAL))
@@ -17,6 +18,7 @@ def printTrivySummary(String reportFile) {
         else
             echo "No HIGH/CRITICAL vulnerabilities found"
         fi
+        set -x
     """
 }
 
@@ -94,7 +96,8 @@ pipeline{
         {
             steps
             {
-                sh '''
+                sh 
+                '''
                 cd ./backend
                 docker build -t food-del-backend:$BUILD_NUMBER .
 				'''
@@ -102,8 +105,7 @@ pipeline{
 				{
 					int trivyExitCode = sh(
 						script: '''
-                                ls -laht
-								docker compose run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report-backend.json food-del-backend:$BUILD_NUMBER
+                                docker compose run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report-backend.json food-del-backend:$BUILD_NUMBER
 					           ''',
 						returnStatus: true
 						)
@@ -123,12 +125,10 @@ pipeline{
             steps
             {
                 sh '''
-                docker build -t food-del-backend:$BUILD_NUMBER .
                 docker tag food-del-backend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:$BUILD_NUMBER
                 docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:$BUILD_NUMBER
 				docker tag food-del-backend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:latest
 				docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_BACKEND:latest
-                cd ..
                 '''
             }
         }
@@ -137,59 +137,83 @@ pipeline{
 
         // Frontend - Build, Scan and Push
 
-        stage ('Build & Scan Food Delivery Frontend Image')
+    stage ('Build & Scan Food Delivery Frontend Image')
         {
             steps
             {
                 sh '''
                 cd ./frontend
                 docker build -t food-del-frontend:$BUILD_NUMBER .
-                docker compose -f ../docker-compose.yml run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report_frontend.json food-del-frontend:$BUILD_NUMBER
-                '''
-            }
-        }
-
+				'''
+				script 
+				{
+					int trivyExitCode = sh(
+						script: '''
+                                docker compose run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report-frontend.json food-del-frontend:$BUILD_NUMBER
+					           ''',
+						returnStatus: true
+						)
+                           
+						printTrivySummary('trivy-report-frontend.json')
+						if (trivyExitCode != 0) 
+						{
+							error('HIGH/CRITICAL vulnerabilities detected')
+						}
+								
+				}
+			}
+		}
         stage ('Push Food Delivery Frontend Image to ECR')
         {
             steps
             {
                 sh '''
-                docker build -t food-del-frontend:$BUILD_NUMBER .
                 docker tag food-del-frontend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:$BUILD_NUMBER
                 docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:$BUILD_NUMBER
 				docker tag food-del-backend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:latest
 				docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_FRONTEND:latest
-                cd ..
                 '''
             }
         }
 
         // Admin - Build, Scan and Push
 
-        stage ('Build & Scan Food Admin Frontend Image')
+    stage ('Build & Scan Food Delivery Admin Image')
         {
             steps
             {
                 sh '''
                 cd ./admin
                 docker build -t food-del-admin:$BUILD_NUMBER .
-                docker compose -f ../docker-compose.yml run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report_admin.json food-del-admin:$BUILD_NUMBER
-
-                '''
-            }
-        }
+				'''
+				script 
+				{
+					int trivyExitCode = sh(
+						script: '''
+                                docker compose run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report-admin.json food-del-admin:$BUILD_NUMBER
+					           ''',
+						returnStatus: true
+						)
+                           
+						printTrivySummary('trivy-report-admin.json')
+						if (trivyExitCode != 0) 
+						{
+							error('HIGH/CRITICAL vulnerabilities detected')
+						}
+								
+				}
+			}
+		}
 
         stage ('Push Food Delivery Admin Image to ECR')
         {
             steps
             {
                 sh '''
-                docker build -t food-del-admin:$BUILD_NUMBER .
                 docker tag food-del-admin:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:$BUILD_NUMBER
                 docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:$BUILD_NUMBER
 				docker tag food-del-backend:$BUILD_NUMBER $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:latest
 				docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_ADMIN:latest
-                cd ..
                 '''
             }
         }
