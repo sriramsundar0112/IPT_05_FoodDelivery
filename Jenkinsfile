@@ -96,8 +96,7 @@ pipeline{
         {
             steps
             {
-                sh 
-                '''
+                sh '''
                 cd ./backend
                 docker build -t food-del-backend:$BUILD_NUMBER .
 				'''
