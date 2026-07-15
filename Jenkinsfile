@@ -102,15 +102,12 @@ pipeline{
 				{
 					int trivyExitCode = sh(
 						script: '''
-								docker compose -f ../docker-compose.yml run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report-backend.json food-del-backend:$BUILD_NUMBER
+                                ls -laht
+								docker compose run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report-backend.json food-del-backend:$BUILD_NUMBER
 					           ''',
 						returnStatus: true
 						)
-                            sh '''
-                               ls -laht
-                               cp trivy-report-backend.json ..
-                               '''
-
+                           
 						printTrivySummary('trivy-report-backend.json')
 						if (trivyExitCode != 0) 
 						{
