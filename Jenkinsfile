@@ -107,7 +107,7 @@ pipeline{
                                 ''',
 						returnStatus: true
 						)
-						printTrivySummary('trivy-report.json')
+						printTrivySummary('trivy-report-backend.json')
 						if (trivyExitCode != 0) 
 						{
 							error('HIGH/CRITICAL vulnerabilities detected')
