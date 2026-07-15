@@ -4,9 +4,11 @@
   "description": "",
   "type": "module",
   "main": "server.js",
-  "scripts": {
-    "server": "nodemon server.js"
-  },
+  
+"scripts": {
+  "start": "node server.js"
+},
+
   "author": "",
   "license": "ISC",
   "dependencies": {
