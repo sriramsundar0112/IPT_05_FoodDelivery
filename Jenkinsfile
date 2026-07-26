@@ -98,7 +98,7 @@ pipeline{
             {
                 sh '''
                 cd ./backend
-                docker build --pull -t food-del-backend:$BUILD_NUMBER .
+                docker build --no-cache --pull -t food-del-backend:$BUILD_NUMBER .
 				'''
 				script 
 				{
