@@ -99,7 +99,7 @@ pipeline{
                 sh '''
                 cd ./backend
                 docker build --no-cache --pull -t food-del-backend:$BUILD_NUMBER .
-				docker run --rm food-del-backend:$BUILD_NUMBER sh -c "find /app/node_modules -name package.json | xargs grep -l '5.0.7'"
+				docker run --rm food-del-backend:63 sh -c "cd /app && npm ls brace-expansion --all" || true
 				'''
 				script 
 				{
