@@ -104,7 +104,7 @@ pipeline{
 				{
 					int trivyExitCode = sh(
 						script: '''
-                                docker compose run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format json -o /workspace/trivy-report-backend.json food-del-backend:$BUILD_NUMBER
+                                docker compose run --rm -v $(pwd):/workspace trivy image --severity HIGH,CRITICAL --exit-code 1 --format table -o /workspace/trivy-report-backend.txt food-del-backend:$BUILD_NUMBER
 					           ''',
 						returnStatus: true
 						)
