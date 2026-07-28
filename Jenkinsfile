@@ -98,8 +98,7 @@ pipeline{
             {
                 sh '''
                 cd ./backend
-                docker build --no-cache --pull -t food-del-backend:$BUILD_NUMBER .
-				docker run --rm food-del-backend:63 sh -c "cd /app && npm ls brace-expansion --all" || true
+                docker build --pull -t food-del-backend:$BUILD_NUMBER .
 				'''
 				script 
 				{
